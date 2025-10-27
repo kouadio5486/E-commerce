@@ -16,6 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.views.generic import RedirectView
 
 urlpatterns = [
      # Accès à l’admin Django
@@ -24,4 +25,6 @@ urlpatterns = [
     path('api/', include('apps.api.urls')), 
      # Routes personnalisées pour login/register/logout
     path('auth/', include('apps.users.urls')),
+    # Rediriger la racine vers l'admin pour éviter 404 sur '/'
+    path('', RedirectView.as_view(url='/admin/', permanent=False)),
 ]

@@ -7,7 +7,7 @@ from .models import Order, OrderItem
 class OrderItemInline(admin.TabularInline):
     model = OrderItem
     extra = 0
-    raw_id_fields = ("product",)
+    autocomplete_fields = ("product",)
     fields = ("product", "quantity", "price")
 
 
@@ -19,7 +19,7 @@ class OrderAdmin(admin.ModelAdmin):
     ordering = ("-date",)
     date_hierarchy = "date"
     list_select_related = ("user",)
-    raw_id_fields = ("user",)
+    autocomplete_fields = ("user",)
     inlines = [OrderItemInline]
 
     def items_count(self, obj):
@@ -32,4 +32,4 @@ class OrderItemAdmin(admin.ModelAdmin):
     list_display = ("id", "order", "product", "quantity", "price")
     search_fields = ("order__user__email", "product__name")
     list_select_related = ("order", "product")
-    raw_id_fields = ("order", "product")
+    autocomplete_fields = ("order", "product")

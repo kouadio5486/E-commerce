@@ -7,7 +7,7 @@ from .models import Product, Favorite
 class FavoriteInline(admin.TabularInline):
     model = Favorite
     extra = 0
-    raw_id_fields = ("user",)
+    autocomplete_fields = ("user",)
     fields = ("user",)
 
 
@@ -25,4 +25,4 @@ class FavoriteAdmin(admin.ModelAdmin):
     list_display = ("id", "user", "product")
     search_fields = ("user__email", "product__name")
     list_select_related = ("user", "product")
-    raw_id_fields = ("user", "product")
+    autocomplete_fields = ("user", "product")

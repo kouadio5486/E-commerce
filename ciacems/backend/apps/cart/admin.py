@@ -10,4 +10,4 @@ class CartItemAdmin(admin.ModelAdmin):
     search_fields = ("user__email", "product__name")
     ordering = ("-id",)
     list_select_related = ("user", "product")
-    raw_id_fields = ("user", "product")
+    autocomplete_fields = ("user", "product")
