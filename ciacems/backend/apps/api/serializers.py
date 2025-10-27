@@ -14,11 +14,8 @@ class RegisterSerializer(serializers.ModelSerializer):
         extra_kwargs = {'password': {'write_only': True}}
 
     def create(self, validated_data):
-        password = validated_data.pop('password', None)
-        user = User.objects.create_user(**validated_data)
-        if password:
-            user.set_password(password)
-            user.save()
+        password = validated_data.pop('password')
+        user = User.objects.create_user(password=password, **validated_data)
         return user
 
 

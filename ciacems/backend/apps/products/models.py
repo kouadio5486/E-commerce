@@ -17,3 +17,8 @@ class Favorite(models.Model):
 
     def __str__(self):
         return f"{self.user.email} - {self.product.name}"
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=["user", "product"], name="uniq_user_product_favorite")
+        ]
