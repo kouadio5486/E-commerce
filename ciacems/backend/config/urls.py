@@ -18,7 +18,10 @@ from django.contrib import admin
 from django.urls import path, include
 
 urlpatterns = [
+     # Accès à l’admin Django
     path('admin/', admin.site.urls),
+    # Toutes les routes API générées automatiquement
     path('api/', include('apps.api.urls')), 
+     # Routes personnalisées pour login/register/logout
     path('auth/', include('apps.users.urls')),
 ]
