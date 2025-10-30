@@ -1,30 +1,52 @@
 <script setup lang="ts">
-import HelloWorld from './components/HelloWorld.vue'
+import { computed } from 'vue'
+import { useAuthStore } from './stores/auth'
+
+const auth = useAuthStore()
+const isLogged = computed(() => !!auth.access)
+
+const handleLogout = async () => {
+  try {
+    await auth.logout()
+  } catch (e) {
+    alert('Erreur lors de la déconnexion')
+  }
+}
 </script>
 
 <template>
-  <div>
-    <a href="https://vite.dev" target="_blank">
-      <img src="/vite.svg" class="logo" alt="Vite logo" />
-    </a>
-    <a href="https://vuejs.org/" target="_blank">
-      <img src="./assets/vue.svg" class="logo vue" alt="Vue logo" />
-    </a>
-  </div>
-  <HelloWorld msg="Vite + Vue" />
+  <header class="nav">
+    <nav>
+      <router-link to="/products">Produits</router-link>
+      <router-link to="/favorites">Favoris</router-link>
+      <router-link to="/cart">Panier</router-link>
+      <span class="spacer" />
+      <router-link v-if="!isLogged" to="/login">Connexion</router-link>
+      <router-link v-if="!isLogged" to="/register">Inscription</router-link>
+      <button v-if="isLogged" @click="handleLogout">Se déconnecter</button>
+    </nav>
+  </header>
+
+  <main>
+    <router-view />
+  </main>
 </template>
 
 <style scoped>
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
+.nav {
+  border-bottom: 1px solid #e5e7eb;
+  margin-bottom: 1rem;
 }
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
+nav {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  padding: 0.75rem 1rem;
 }
-.logo.vue:hover {
-  filter: drop-shadow(0 0 2em #42b883aa);
+.spacer {
+  flex: 1;
+}
+main {
+  padding: 1rem;
 }
 </style>

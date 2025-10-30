@@ -22,4 +22,6 @@ urlpatterns = [
     # importe toutes les routes créées par DefaultRouter
     path('', include(router.urls)),
     path('orders/create/', CreateOrderView.as_view(), name='orders-create'),
+    
+     
 ]

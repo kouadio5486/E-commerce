@@ -16,8 +16,21 @@ export const useProductStore = defineStore('products', {
 
   actions: {
     async fetchProducts() {
-      const { data } = await api.get('products/')
-      this.products = data
+      try {
+        const { data } = await api.get('products/')
+        this.products = data
+      } catch (error: any) {
+        const status = error?.response?.status
+        if (status === 401) {
+          // Token invalide/expiré: nettoyer et réessayer en public
+          localStorage.removeItem('access')
+          localStorage.removeItem('refresh')
+          const { data } = await api.get('products/')
+          this.products = data
+        } else {
+          throw error
+        }
+      }
     },
   },
 })

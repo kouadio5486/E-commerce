@@ -1,26 +1,28 @@
 import { defineStore } from 'pinia'
-
 import api from '../api/axios'
+import authApi from '../api/auth'
 
 interface User {
-    id: number
-    username: string
-    email: string
+  id: number
+  email: string
+  first_name: string
+  last_name: string
 }
 
-export const useAuthStore = defineStore('auth',{
-    state: () => ({
+export const useAuthStore = defineStore('auth', {
+  state: () => ({
     user: null as User | null,
     access: localStorage.getItem('access'),
     refresh: localStorage.getItem('refresh'),
-}),
-actions: {
-    async register(username: string, email: string, password: string) {
-      await api.post('users/register/', { username, email, password })
+  }),
+
+  actions: {
+    async register(email: string, first_name: string, last_name: string, password: string) {
+      await authApi.post('register/', { email, first_name, last_name, password })
     },
 
-    async login(username: string, password: string) {
-      const { data } = await api.post('users/login/', { username, password })
+    async login(email: string, password: string) {
+      const { data } = await authApi.post('login/', { email, password })
       this.access = data.access
       this.refresh = data.refresh
       localStorage.setItem('access', data.access)
@@ -28,11 +30,19 @@ actions: {
     },
 
     async logout() {
-      await api.post('users/logout/', { refresh: this.refresh })
-      this.access = null
-      this.refresh = null
-      this.user = null
-      localStorage.clear()
+      try {
+        if (this.refresh) {
+          await authApi.post('logout/', { refresh: this.refresh })
+        }
+      } catch (e) {
+        // Ignorer les erreurs (401/400) et nettoyer l'état côté client
+      } finally {
+        this.access = null
+        this.refresh = null
+        this.user = null
+        localStorage.removeItem('access')
+        localStorage.removeItem('refresh')
+      }
     },
   },
 })

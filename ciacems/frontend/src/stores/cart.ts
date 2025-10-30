@@ -14,18 +14,18 @@ export const useCartStore = defineStore('cart', {
 //Récupère les articles du panier depuis l’API et les stocke dans items.
   actions: {
     async fetchCart() {
-      const { data } = await api.get('cart/')
+      const { data } = await api.get('carts/')
       this.items = data
     },
 // Envoie une requête POST à l’API pour ajouter un produit au panier.
     async addToCart(productId: number, quantity = 1) {
-      await api.post('cart/', { product: productId, quantity })
+      await api.post('carts/', { product: productId, quantity })
       //Recharge ensuite le panier avec fetchCart().
       this.fetchCart()
     },
 //Supprime un article du panier via l’API, puis recharge le panier.
     async removeFromCart(itemId: number) {
-      await api.delete(`cart/${itemId}/`)
+      await api.delete(`carts/${itemId}/`)
       this.fetchCart()
     },
  //Envoie une commande à l’API pour valider l’achat.
