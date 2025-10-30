@@ -4,9 +4,9 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from apps.products.models import Product, Favorite
 from apps.cart.models import CartItem
 from apps.orders.models import Order, OrderItem
-
+# récupère le modèle d’utilisateur actif (utile si tu as un AUTH_USER_MODEL
 User = get_user_model()
-
+# ModelSerializer : génère automatiquement les champs à partir du modèle User
 class RegisterSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
@@ -14,6 +14,7 @@ class RegisterSerializer(serializers.ModelSerializer):
         extra_kwargs = {'password': {'write_only': True}}
 
     def create(self, validated_data):
+        # on retire le mot de passe des données validées (pour le traiter séparément).
         password = validated_data.pop('password')
         user = User.objects.create_user(password=password, **validated_data)
         return user

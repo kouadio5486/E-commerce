@@ -27,12 +27,12 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = UserSerializer
     permission_classes = [permissions.IsAdminUser]
 
-
+# ModelViewSet : toutes les actions CRUD sont disponibles.
 class ProductViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-
+    # get_permissions: Méthode spéciale : change les permissions selon l’action.
     def get_permissions(self):
         if self.action in ("create", "update", "partial_update", "destroy"):
             return [permissions.IsAdminUser()]
@@ -44,37 +44,45 @@ class FavoriteViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
+    # Chaque utilisateur ne voit que ses favoris 
         return Favorite.objects.filter(user=self.request.user)
-
+    #  Récupère le product envoyé par le client.
     def create(self, request, *args, **kwargs):
         product_id = request.data.get("product")
         if not product_id:
             return Response({"error": "product est requis"}, status=status.HTTP_400_BAD_REQUEST)
+           # Si le produit est déjà dans les favoris, on ne crée pas un doublon (get_or_create)
         fav, created = Favorite.objects.get_or_create(user=request.user, product_id=product_id)
         serializer = self.get_serializer(fav)
         return Response(serializer.data, status=status.HTTP_201_CREATED if created else status.HTTP_200_OK)
 
-
+#Gère le panier de l’utilisateur connecté.
+#Chaque utilisateur voit uniquement son panier
 class CartViewSet(viewsets.ModelViewSet):
     serializer_class = CartItemSerializer
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
+        #Le panier affiché est celui du user connecté.
         return CartItem.objects.filter(user=self.request.user)
 
     def create(self, request, *args, **kwargs):
+        #Récupère le product et la quantity depuis le body.
         product_id = request.data.get("product")
         quantity = int(request.data.get("quantity", 1))
+        #Si le produit est déjà dans le panier, on augmente la quantité.
         if not product_id:
             return Response({"error": "product est requis"}, status=status.HTTP_400_BAD_REQUEST)
         item, created = CartItem.objects.get_or_create(user=request.user, product_id=product_id, defaults={"quantity": quantity})
+        #Sinon, on crée une nouvelle ligne de panier.
         if not created:
             item.quantity += max(quantity, 1)
             item.save(update_fields=["quantity"])
         serializer = self.get_serializer(item)
         return Response(serializer.data, status=status.HTTP_201_CREATED if created else status.HTTP_200_OK)
 
-
+#Permet de voir les commandes
+#Les utilisateurs normaux ne voient que leurs commandes.
 class OrderViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = OrderSerializer
     permission_classes = [permissions.IsAuthenticated]
@@ -104,7 +112,7 @@ class CreateOrderView(generics.CreateAPIView):
             total = Decimal("0")
 
             for item in cart_items.select_related("product"):
-                price = item.product.price  # snapshot du prix
+                price = item.product.price  
                 OrderItem.objects.create(
                     order=order,
                     product=item.product,
