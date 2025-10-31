@@ -25,6 +25,12 @@
       </tbody>
     </table>
     <button v-if="items.length" class="checkout-button" @click="cart.checkout()">Passer la commande</button>
+    <div v-if="cart.notice" class="checkout-notice" :class="cart.notice.type">
+      {{ cart.notice.text }}
+    </div>
+
+
+
   </div>
 </template>
 
@@ -32,6 +38,8 @@
 import { onMounted, computed } from 'vue'
 import { useCartStore } from '../stores/cart'
 import '../assets/style/carts.css'
+
+
 
 const cart = useCartStore()
 
