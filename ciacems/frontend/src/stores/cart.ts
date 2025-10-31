@@ -30,9 +30,25 @@ export const useCartStore = defineStore('cart', {
     },
  //Envoie une commande à l’API pour valider l’achat.
     async checkout() {
-      const { data } = await api.post('orders/create/')
-      alert(`✅ ${data.message}`)
-      this.items = []
+      try {
+        const { data } = await api.post('orders/create/')
+        alert(`✅ ${data.message}`)
+        this.items = []
+      } catch (error: any) {
+        const status = error?.response?.status
+        const payload = error?.response?.data || {}
+        if (status === 400) {
+          const msg = payload.error || payload.detail || 'Commande invalide'
+          alert(`❌ ${msg}`)
+          return
+        }
+        if (status === 401) {
+          alert('❌ Veuillez vous connecter pour passer la commande')
+          return
+        }
+        console.error('Checkout error:', error)
+        alert('❌ Une erreur est survenue, réessayez plus tard')
+      }
     },
   },
 })

@@ -19,9 +19,11 @@ router.register(r'carts', CartViewSet, basename='carts')
 router.register(r'favorites', FavoriteViewSet, basename='favorites')
 
 urlpatterns = [
+    # Endpoint de création de commande DOIT être déclaré avant le router
+    # sinon '/orders/create/' est pris comme pk par le router et provoque 405
+    path('orders/create/', CreateOrderView.as_view(), name='orders-create'),
     # importe toutes les routes créées par DefaultRouter
     path('', include(router.urls)),
-    path('orders/create/', CreateOrderView.as_view(), name='orders-create'),
     
      
 ]

@@ -31,16 +31,20 @@ class ProductSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class FavoriteSerializer(serializers.ModelSerializer):
+    product_detail = ProductSerializer(source='product', read_only=True)
+
     class Meta:
         model = Favorite
-        fields = ['id', 'user', 'product']
+        fields = ['id', 'user', 'product', 'product_detail']
         read_only_fields = ['user']
 
 
 class CartItemSerializer(serializers.ModelSerializer):
+    product_detail = ProductSerializer(source='product', read_only=True)
+
     class Meta:
         model = CartItem
-        fields = ['id', 'user', 'product', 'quantity']
+        fields = ['id', 'user', 'product', 'product_detail', 'quantity']
         read_only_fields = ['user']
 
 
@@ -53,6 +57,8 @@ class OrderItemSerializer(serializers.ModelSerializer):
 
 
 class OrderSerializer(serializers.ModelSerializer):
+    
+
     items = OrderItemSerializer(many=True, read_only=True)
 
     class Meta:
